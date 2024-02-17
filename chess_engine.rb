@@ -7,8 +7,7 @@ require_relative './chess_pieces'
 #   def bg_grey; "\e[47m#{self}\e[0m]" end
 # end
 
-# TODO: add the move set to each piece
-# FIXME: The possible moves array is empty
+# TODO: write moveset for other pieces
 
 # this should hold the game logic
 class Chess
@@ -133,12 +132,12 @@ class Chess
     piece_select = @board[piece_select[0]][piece_select[1]]
     valid_moves = update_board_possible_moves(piece_select)
     # second phase
-    move_piece('Select a spot to move to', player, valid_moves, piece_select)
+    move_piece('Select a spot to move ', valid_moves, piece_select)
   end
 
-  def move_piece(message,player, poss_move, piece)
+  def move_piece(message, poss_move, piece)
     # move to and clear the old spot
-    new_spot = valid_move_slot(player, message, poss_move)
+    new_spot = valid_move_slot(piece, message, poss_move)
     old_spot = piece.curr_loc
     
 
@@ -153,10 +152,10 @@ class Chess
     @board[old_spot[0]][old_spot[1]] = '-'
   end
 
-  def valid_move_slot(pl,message, poss_move)
+  def valid_move_slot(piece,message, poss_move)
     choice = []
     loop do
-      print "#{pl.name} #{message}: "
+      print "#{message}#{piece.name} to: "
       choice = gets.chomp
       if choice[0].match?(/[a-h]/) && choice[1].match?(/[1-8]/)
         check = convert_choice(choice)
@@ -252,7 +251,6 @@ while in_game
   # chess_game.check_win2
 end
 
-# TODO: create a play turn method inside the chess class
 # check piece location on board
 # chess_game.draw_board
 # puts "#{chess_game.board[0][0].color} #{chess_game.board[0][0].name}"

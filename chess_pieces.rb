@@ -30,17 +30,21 @@ class Pawn
     if one_step == '-' && !one_step.nil?
       @possible_moves << [curr_loc[0] + move_index, curr_loc[1]]
     end
+
     diagonal_left = board[curr_loc[0] + move_index][curr_loc[1] - move_index]
-    # FIXME: diagonal part not working
-    if !diagonal_left.nil? && !diagonal_left == '-' && !diagonal_left.color == @color
-      @possible_moves << [curr_loc[0] + move_index, curr_loc[1] - move_index]
+    if curr_loc[0] + move_index < 8 && curr_loc[1] < 8 && !diagonal_left.nil?
+      if diagonal_left != '-' && diagonal_left.color != @color
+        @possible_moves << [curr_loc[0] + move_index, curr_loc[1] - move_index]
+      end
     end
-    
+
     diagonal_right = board[curr_loc[0] + move_index][curr_loc[1] + move_index]
-    if !diagonal_right.nil? && !diagonal_right == '-' && !diagonal_right.color == @color
-      @possible_moves << [curr_loc[0] + move_index, curr_loc[1] + move_index]
+    if curr_loc[0] + move_index < 8 && curr_loc[1] < 8 && !diagonal_right.nil?
+      if diagonal_right != '-' && diagonal_right.color != @color
+        @possible_moves << [curr_loc[0] + move_index, curr_loc[1] + move_index]
+      end
     end
-    
+
     @possible_moves
   end
 end
