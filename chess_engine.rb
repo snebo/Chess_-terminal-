@@ -8,14 +8,17 @@ require_relative './chess_pieces'
 # end
 
 # TODO: add the move set to each piece
+# FIXME: The possible moves array is empty
 
 # this should hold the game logic
 class Chess
+  attr_reader :board
+
   def initialize(first_player, second_player)
     @pl1 = first_player
     @pl2 = second_player
     @board = Array.new(8) {Array.new(8, '-')}
-
+    @turn = true
     game_setup
   end
 
@@ -41,7 +44,7 @@ class Chess
                     w_r1, w_kn1, w_b1, w_q, w_kg, w_b2, w_kn2, w_r2]
     # set white pieces position and locations
     k = 0
-    (6..7).each do |i|
+    [1, 0].each do |i|
       j = 0
       while j < @board[i].length
         @board[i][j] = white_pieces[k]
@@ -72,7 +75,7 @@ class Chess
                     b_p1, b_p2, b_p3, b_p4, b_p5, b_p6, b_p7, b_p8]
     # set black posiiton
     k = 0
-    [0, 1].each do |i|
+    [7, 6].each do |i|
       j = 0
       while j < @board[i].length
         @board[i][j] = black_pieces[k]
@@ -91,7 +94,7 @@ class Chess
   end
 
   def draw_board(board = @board)
-    system('cls') || system('clear')
+    # system('cls') || system('clear')
     cols = '    a   b   c   d   e   f   g   h'
     rows = [1, 2, 3, 4, 5, 6, 7, 8]
     line = '  ---------------------------------'
@@ -100,18 +103,72 @@ class Chess
 
     lst_pice = space + print_lst_pices(@pl1, k) + div_space + print_lst_pices(@pl2, k)
 
-    rows.reverse.each_with_index do |val, row|
-      print val
+    # loop start here
+    rows.reverse.each do |row|
+      print row
       # print the value of the baord
-      (0..7).each do |col|
-        curr = board[row][col]
-        curr == '-' ? print(mpt) : print(" | #{curr.value}")
+      (0..7).to_a.each do |col|
+        curr = board[row - 1][col]
+        if curr == '*'
+          print ' | *'
+        else
+          curr == '-' ? print(mpt) : print(" | #{curr.value}")
+        end
       end
       print " |#{lst_pice}\n#{line}\n"
-      k += 2
+      k += 2 # k is the number of taken pieces to show in a line
     end
     puts cols
   end
+
+  def play_turn(turn = @turn)
+    turn ? play(@pl1) : play(@pl2)
+  end
+
+  def play(player)
+    p_message = 'please select a piece to move(a1, b2,...): '
+    m_message = 'Select a spot to move to: '
+    piece_select = valid_slot(player, p_message)
+    piece_select = @board[piece_select[0]][piece_select[1]]
+    update_board_possible_moves(piece_select)
+  end
+
+  def update_board_possible_moves(select_p)
+    poss_move = select_p.possible_moves(@board)
+    p poss_move
+    poss_move.each do |move|
+      @board[move[0]][move[1]] = '*' if @board[move[0]][move[1]] == '-'
+    end
+    draw_board
+  end
+
+  def valid_slot(player, message)
+    choice = []
+    loop do
+      print "#{player.name} #{message}"
+      choice = gets.chomp
+      choice = choice.split('')
+      if choice[0].match?(/[a-h]/) && choice[1].match?(/[1-8]/)
+        check = convert_choice(choice)
+        piece = @board[check[0]][check[1]]
+        if !(piece == '-')
+          break if (piece.color == player.color) # use if and !(...)
+        end
+      end
+    end
+    puts ''
+    convert_choice(choice)
+  end
+
+  def convert_choice(value)
+    new_val = []
+    values = %w[a b c d e f g h]
+    # value = [values.index(value[0]), value[1]]
+    new_val << value[1].to_i - 1
+    new_val << values.index(value[0])
+    new_val
+  end
+
 end
 
 class Player
@@ -152,4 +209,15 @@ else
   chess_game = Chess.new(person1, person2)
 end
 
+# in_game = true
+
+# while in_game
+#   chess_game.draw_board
+#   chess_game.play_turn
+  # chess_game.check_win2
+# end
+
+# TODO: create a play turn method inside the chess class
+# find the board
 chess_game.draw_board
+puts "#{chess_game.board[0][0].color} #{chess_game.board[0][0].name}"
