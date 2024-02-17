@@ -18,7 +18,7 @@ class Pawn
     # two steps foward, if has not moved and space is empty
     # check if diagonal is not empty and has an opposing piece
     @possible_moves = []
-    move_index = @color == 'white' ? -1 : 1
+    move_index = @color == 'black' ? -1 : 1
 
     two_step = board[curr_loc[0] + (move_index + move_index)][curr_loc[1]]
     if two_step == '-' && !two_step.nil? && @has_moved == false

@@ -127,7 +127,7 @@ class Chess
 
   def play(player)
     p_message = 'please select a piece to move(a1, b2,...): '
-    m_message = 'Select a spot to move to: '
+    # m_message = 'Select a spot to move to: '
     piece_select = valid_slot(player, p_message)
     piece_select = @board[piece_select[0]][piece_select[1]]
     update_board_possible_moves(piece_select)
@@ -204,20 +204,20 @@ else
   name1 = gets.chomp
   print "\nPlayer2 enter your name: "
   name2 = gets.chomp
-  person1 = Player.new(name1, 'black')
-  person2 = Player.new(name2, 'white')
+  person1 = Player.new(name1, 'white')
+  person2 = Player.new(name2, 'black')
   chess_game = Chess.new(person1, person2)
 end
 
-# in_game = true
+in_game = true
 
-# while in_game
-#   chess_game.draw_board
-#   chess_game.play_turn
+while in_game
+  chess_game.draw_board
+  chess_game.play_turn
   # chess_game.check_win2
-# end
+end
 
 # TODO: create a play turn method inside the chess class
-# find the board
-chess_game.draw_board
-puts "#{chess_game.board[0][0].color} #{chess_game.board[0][0].name}"
+# check piece location on board
+# chess_game.draw_board
+# puts "#{chess_game.board[0][0].color} #{chess_game.board[0][0].name}"
