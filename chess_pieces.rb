@@ -31,6 +31,7 @@ class Pawn
       @possible_moves << [curr_loc[0] + move_index, curr_loc[1]]
     end
     diagonal_left = board[curr_loc[0] + move_index][curr_loc[1] - move_index]
+    # FIXME: diagonal part not working
     if !diagonal_left.nil? && !diagonal_left == '-' && !diagonal_left.color == @color
       @possible_moves << [curr_loc[0] + move_index, curr_loc[1] - move_index]
     end

@@ -121,8 +121,9 @@ class Chess
     puts cols
   end
 
-  def play_turn(turn = @turn)
-    turn ? play(@pl1) : play(@pl2)
+  def play_turn()
+    @turn ? play(@pl1) : play(@pl2)
+    @turn = !@turn
   end
 
   def play(player)
@@ -154,7 +155,7 @@ class Chess
 
   def valid_move_slot(pl,message, poss_move)
     choice = []
-    loop do 
+    loop do
       print "#{pl.name} #{message}: "
       choice = gets.chomp
       if choice[0].match?(/[a-h]/) && choice[1].match?(/[1-8]/)
