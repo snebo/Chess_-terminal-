@@ -137,6 +137,7 @@ class Chess
 
   def move_piece(message, poss_move, piece)
     # move to and clear the old spot
+    convet_moves(poss_move)
     new_spot = valid_move_slot(piece, message, poss_move)
     old_spot = piece.curr_loc
     
@@ -152,6 +153,16 @@ class Chess
     @board[old_spot[0]][old_spot[1]] = '-'
   end
 
+  def convet_moves(poss_move)
+    return if poss_move.empty?
+
+    letter = %w[a b c d e f g h]
+    poss_move.each do |val|
+      print "[#{letter[val[1]]} #{val[0] + 1}]"
+    end
+    puts ''
+  end
+
   def valid_move_slot(piece,message, poss_move)
     choice = []
     loop do
@@ -159,7 +170,7 @@ class Chess
       choice = gets.chomp
       if choice[0].match?(/[a-h]/) && choice[1].match?(/[1-8]/)
         check = convert_choice(choice)
-        puts "possible: #{poss_move}, choice: #{check}"
+        # puts "possible: #{poss_move}, choice: #{check}"
         break if poss_move.include?(check)
       end
     end
