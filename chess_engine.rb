@@ -93,7 +93,7 @@ class Chess
   end
 
   def draw_board(board = @board)
-    # system('cls') || system('clear')
+    system('cls') || system('clear')
     cols = '    a   b   c   d   e   f   g   h'
     rows = [1, 2, 3, 4, 5, 6, 7, 8]
     line = '  ---------------------------------'

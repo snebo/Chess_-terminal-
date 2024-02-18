@@ -61,6 +61,69 @@ class Rook
     @possible_moves = []
     @value = color == 'black' ? "\u2656" : "\u265C"
   end
+
+  def possible_moves(board)
+    @possible_moves = []
+    # horizontally
+    row = @curr_loc[1] + 1
+    # positive
+    while row < 8
+      right = board[@curr_loc[0]][row]
+      if !right.nil?
+        if right == '-'
+          @possible_moves << [@curr_loc[0], row]
+        else
+          # meeting a piece
+          right.color == @color ? (break) : (@possible_moves << [@curr_loc[0], row]; break)
+        end
+      end
+      row += 1
+    end
+    # negative
+    row = @curr_loc[1] - 1
+    while row >= 0
+      left = board[@curr_loc[0]][row]
+      if !left.nil?
+        if left == '-'
+          @possible_moves << [@curr_loc[0], row]
+        else
+          # meeting a piece
+          left.color == @color ? (break) : (@possible_moves << [@curr_loc[0], row]; break)
+        end
+      end
+      row -= 1
+    end
+
+    # vertically
+    col = @curr_loc[0] + 1
+    while col < 8
+      front = board[col][@curr_loc[1]]
+      if !front.nil?
+        if front == '-'
+          @possible_moves << [col, @curr_loc[1]]
+        else
+          # meeting a piece
+          front.color == @color ? (break) : (@possible_moves << [col, @curr_loc[1]]; break)
+        end
+      end
+      col += 1
+    end
+    # negative
+    col = @curr_loc[0] - 1
+    while col >= 0
+      back = board[col][@curr_loc[1]]
+      if !back.nil?
+        if back == '-'
+          @possible_moves << [col, @curr_loc[1]]
+        else
+          # meeting a piece
+          back.color == @color ? (break) : (@possible_moves << [col, @curr_loc[1]]; break)
+        end
+      end
+      col -= 1
+    end
+    @possible_moves
+  end
 end
 
 class Bishop
