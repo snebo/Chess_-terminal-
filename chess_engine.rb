@@ -85,11 +85,11 @@ class Chess
   end
 
   def lst_pices(ply, val)
-    lost = '  '
+    lost = '   '
     return lost if ply.lost_pieces[val].nil?
 
-    lost = ply.lost_pieces[val].value
-    ply.lost_pieces[val + 1].nil? ? lost << ", " : lost << ", #{ply.lost_pieces[val + 1]}"
+    lost = ply.lost_pieces[val].to_s # add to value
+    ply.lost_pieces[val + 1].nil? ? lost << ",  " : lost << ",#{ply.lost_pieces[val + 1]}"
     lost
   end
 
