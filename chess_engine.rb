@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require_relative './chess_pieces'
 
 # class String
@@ -8,6 +6,7 @@ require_relative './chess_pieces'
 # end
 
 # TODO: write moveset for other pieces
+# FIXME: seems to eat all pieces in avalable spot
 
 # this should hold the game logic
 class Chess
@@ -16,7 +15,7 @@ class Chess
   def initialize(first_player, second_player)
     @pl1 = first_player
     @pl2 = second_player
-    @board = Array.new(8) {Array.new(8, '-')}
+    @board = Array.new(8) { Array.new(8, '-') }
     @turn = true
     game_setup
   end
@@ -85,11 +84,13 @@ class Chess
     end
   end
 
-  def print_lst_pices(pl, val)
-    return (' '*pl.name.length) if pl.lost_pieces.empty?
-    
-    print "#{pl.lost_pieces[val]} "
-    pl.lost_pieces[val + 1].nil? ? '' : pl.lost_pieces[val + 1]
+  def lst_pices(ply, val)
+    lost = '  '
+    return lost if ply.lost_pieces[val].nil?
+
+    lost = ply.lost_pieces[val].value
+    ply.lost_pieces[val + 1].nil? ? lost << ", " : lost << ", #{ply.lost_pieces[val + 1]}"
+    lost
   end
 
   def draw_board(board = @board)
@@ -100,7 +101,7 @@ class Chess
     mpt = ' |  '; space = '        '; div_space = '  |  '; k = 0
     puts line + space + @pl1.name + div_space + @pl2.name
 
-    lst_pice = space + print_lst_pices(@pl1, k) + div_space + print_lst_pices(@pl2, k)
+    # lst_pice = space + print_lst_pices(@pl1, k) + div_space + print_lst_pices(@pl2, k)
 
     # loop start here
     rows.reverse.each do |row|
@@ -114,13 +115,17 @@ class Chess
           curr == '-' ? print(mpt) : print(" | #{curr.value}")
         end
       end
-      print " |#{lst_pice}\n#{line}\n"
+      # print " |#{lst_pice}\n#{line}\n"
+      # print "  |#{space} #{print_lst_pices(@pl1, k)}#{div_space}#{print_lst_pices(@pl2, k)}
+      print ' |'
+      print "#{space} #{lst_pices(@pl1, k)} #{div_space}#{lst_pices(@pl2, k)}"
+      print "\n#{line}\n"
       k += 2 # k is the number of taken pieces to show in a line
     end
     puts cols
   end
 
-  def play_turn()
+  def play_turn
     @turn ? play(@pl1) : play(@pl2)
     @turn = !@turn
   end
@@ -137,23 +142,30 @@ class Chess
 
   def move_piece(message, poss_move, piece)
     # move to and clear the old spot
-    convet_moves(poss_move)
-    new_spot = valid_move_slot(piece, message, poss_move)
-    old_spot = piece.curr_loc
-    
+    print_possible_moves(poss_move)
+    new_position = valid_move_slot(piece, message, poss_move)
+    old_position = piece.curr_loc
+
+     # add old piece to discarded table
+    old_piece = @board[new_position[0]][new_position[1]]
+    if old_piece != '*'
+      old_piece.color == 'white' ? @pl1.lost_pieces << old_piece : @pl2.lost_pieces << old_piece
+    end
 
     # clear the possible move slots
     poss_move.each do |val|
-      @board[val[0]][val[1]] = '-'
+      @board[val[0]][val[1]] = '-' if @board[val[0]][val[1]] == '*'
     end
     poss_move.clear
 
-    @board[new_spot[0]][new_spot[1]] = piece
-    piece.curr_loc = new_spot
-    @board[old_spot[0]][old_spot[1]] = '-'
+    # move the piece
+    @board[new_position[0]][new_position[1]] = piece
+    piece.curr_loc = new_position
+    @board[old_position[0]][old_position[1]] = '-'
   end
 
-  def convet_moves(poss_move)
+  def print_possible_moves(poss_move)
+    # print the possible moves for the piece
     return if poss_move.empty?
 
     letter = %w[a b c d e f g h]
@@ -197,7 +209,7 @@ class Chess
         check = convert_choice(choice)
         piece = @board[check[0]][check[1]]
         if !(piece == '-')
-          break if (piece.color == player.color) # use if and !(...)
+          break if piece.color == player.color # use if and !(...)
         end
       end
     end
@@ -213,16 +225,16 @@ class Chess
     new_val << values.index(value[0])
     new_val
   end
-
 end
 
 class Player
   attr_reader :name, :color
   attr_accessor :lost_pieces
+
   def initialize(name, color)
     @name = name
     @color = color
-    @lost_pieces = []
+    @lost_pieces = ['X', 'A', 'X']
   end
 end
 
@@ -232,7 +244,7 @@ def yes_or_no(message)
   loop do
     print "#{message}(y/n): "
     reply = gets.chomp
-    break if ['y', 'n'].any?(reply.chr)
+    break if %w[y n].any?(reply.chr)
   end
   reply == 'y' ? (return true): (return false)
 end
