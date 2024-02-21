@@ -337,4 +337,21 @@ class King
     @possible_moves = []
     @value = color == 'black' ? "\u2654" : "\u265A"
   end
+
+  def possible_moves(board)
+    @possible_moves.push(
+      [(@curr_loc[0] + 1), (@curr_loc[1])], [@curr_loc[0], @curr_loc[1] + 1],
+      [(@curr_loc[0] - 1), (@curr_loc[1])], [@curr_loc[0], @curr_loc[1] - 1],
+      [(@curr_loc[0] + 1), (@curr_loc[1] - 1)], [@curr_loc[0] + 1, @curr_loc[1] + 1],
+      [(@curr_loc[0] - 1), (@curr_loc[1] + 1)], [@curr_loc[0] - 1, @curr_loc[1] - 1])
+    # check out of bounds 
+    @possible_moves = @possible_moves.select do |position|
+      position[0].between?(0, 7) && position[1].between?(0, 7)
+    end
+    # check if the space is empty or has an enemy
+    @possible_moves = @possible_moves.select do |pos|
+      board[pos[0]][pos[1]] == '-' || board[pos[0]][pos[1]].color != @color
+    end
+    @possible_moves
+  end
 end
