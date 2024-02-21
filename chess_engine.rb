@@ -88,7 +88,7 @@ class Chess
     return lost if ply.lost_pieces[val].nil?
 
     lost = ply.lost_pieces[val].value.to_s # add to value
-    ply.lost_pieces[val + 1].nil? ? lost << ", " : lost << ",#{ply.lost_pieces[val + 1].value}"
+    ply.lost_pieces[val + 1].nil? ? lost += ', ' : lost += " ,#{ply.lost_pieces[val + 1].value}"
     lost
   end
 
