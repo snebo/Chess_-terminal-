@@ -5,18 +5,19 @@ require_relative './chess_pieces'
 #   def bg_grey; "\e[47m#{self}\e[0m]" end
 # end
 
-# TODO: write moveset for other pieces
+# TODO: check for game win
+# TODO: add ability to save and load game
 
 # this should hold the game logic
 class Chess
   attr_reader :board
 
-  def initialize(first_player, second_player)
+  def initialize(first_player, second_player, board = Array.new(8) { Array.new(8, '-') }, new = true)
     @pl1 = first_player
     @pl2 = second_player
-    @board = Array.new(8) { Array.new(8, '-') }
+    @board = board
     @turn = true
-    game_setup
+    game_setup if new
   end
 
   def game_setup
@@ -93,7 +94,7 @@ class Chess
   end
 
   def draw_board(board = @board)
-    # system('cls') || system('clear')
+    system('cls') || system('clear')
     cols = '    a   b   c   d   e   f   g   h'
     rows = [1, 2, 3, 4, 5, 6, 7, 8]
     line = '  ---------------------------------'
@@ -204,6 +205,7 @@ class Chess
       print "#{player.name} #{message}"
       choice = gets.chomp
       choice = choice.split('')
+      save_game if choice == 'save'
       if choice[0].match?(/[a-h]/) && choice[1].match?(/[1-8]/)
         check = convert_choice(choice)
         piece = @board[check[0]][check[1]]
@@ -223,6 +225,33 @@ class Chess
     new_val << value[1].to_i - 1
     new_val << values.index(value[0])
     new_val
+  end
+
+  def check_win
+    [@pl1, @pl2].each do |ply|
+      won = ply.lost_pieces.any? {piece.name == 'king'}
+      if won
+        puts "Congrats #{ply.name}, You won!!!"
+        return true
+      end
+    end
+    false
+  end
+
+  def save_game
+    puts 'Enter a name for your save: '
+    name = gets.chomp
+    info = JSON.dump({
+                       pl1: @pl1,
+                       pl2: @pl2,
+                       board: @board,
+                       turn: @turn,
+                     })
+
+    Dir.mkdir('Save_files') unless Dir.exist?('Save_files')
+    File.open("./Save_files/#{name}.json", 'w') do |f|
+      f.puts info
+    end
   end
 end
 
@@ -248,13 +277,34 @@ def yes_or_no(message)
   reply == 'y' ? (return true): (return false)
 end
 
+def load_game
+  list = Dir['Save_files/*']
+    list.each { |i| i.gsub!('.json', '').gsub!('Save_files/', '') }
+    puts list
+    game_file = []
+
+    print "\nEnter the name of your save -> "
+    name = gets.chomp
+    if File.exist?("Save_files/#{name}.json")
+      save = File.read("Save_files/#{name}.json")
+
+      info = JSON.parse(save)
+      pl1 = info['pl1']
+      pl2 = info['pl2']
+      board = info['board']
+      turn = info['turn']
+      puts "Welcome back!"
+      game_file.push([pl1, pl2, board, turn])
+    end
+    game_file
+end
+
 # start
 puts 'Hi, welcome to terminal chess!!!'
-person1 = ''; person2 = ''; s_board = ''; chess_game = ''
 # load game or start afresh
 if yes_or_no('would you line to load a game?')
-  load_game(person1, person2, s_board)
-  chess_game = Chess..new(person1, person2, s_board)
+  game_file = load_game
+  chess_game = Chess.new(game_file[0], game_file[1], game_file[2], game_file[3])
 else
   print 'Player1 enter your name: '
   name1 = gets.chomp
@@ -270,7 +320,7 @@ in_game = true
 while in_game
   chess_game.draw_board
   chess_game.play_turn
-  # chess_game.check_win2
+  chess_game.check_win ? in_game = false : nil
 end
 
 # check piece location on board
