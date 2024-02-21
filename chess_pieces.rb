@@ -137,6 +137,48 @@ class Bishop
     @possible_moves = []
     @value = color == 'black' ? "\u2657" : "\u265D"
   end
+  
+  def possible_moves(board)
+    curr = @curr_loc # [2, 2]
+    # top right 
+    while curr[0] < 7 && curr[1] < 7
+      curr = [curr[0] + 1, curr[1] + 1]
+      @possible_moves << curr
+      break if board[curr[0]][curr[1]] != '-'
+
+    end
+    #top left
+    curr = @curr_loc
+    while curr[0] < 7 && curr[1] > 0
+      curr = [curr[0] + 1, curr[1] - 1]
+      @possible_moves << curr
+      break if board[curr[0]][curr[1]] != '-'
+      
+    end
+    # bottom right
+    curr = @curr_loc
+    while curr[0] > 0 && curr[1] < 7
+      curr = [curr[0] - 1, curr[1] + 1]
+      @possible_moves << curr
+      break if board[curr[0]][curr[1]] != '-'
+      
+    end
+    # botom left
+    curr = @curr_loc
+    while curr[0] > 0 && curr[1] > 0
+      curr = [curr[0] - 1, curr[1] - 1]
+      @possible_moves << curr
+      break if board[curr[0]][curr[1]] != '-'
+
+    end
+    #check placement
+    p @possible_moves
+
+    @possible_moves = @possible_moves.select do |pos|
+      board[pos[0]][pos[1]] == '-' || board[pos[0]][pos[1]].color != @color
+    end
+    p @possible_moves
+  end
 end
 
 class Knight
@@ -149,6 +191,24 @@ class Knight
     @name = 'knight'
     @possible_moves = []
     @value = color == 'black' ? "\u2658" : "\u265E"
+  end
+
+  def possible_moves(board)
+    # TODO: use method from knight traversal
+    @possible_moves.push(
+                          [(@curr_loc[0] + 2), (@curr_loc[1] + 1)], [@curr_loc[0] + 1, @curr_loc[1] + 2],
+                          [(@curr_loc[0] - 1), (@curr_loc[1] + 2)], [@curr_loc[0] - 2, @curr_loc[1] + 1],
+                          [(@curr_loc[0] + 1), (@curr_loc[1] - 2)], [@curr_loc[0] + 2, @curr_loc[1] - 1],
+                          [(@curr_loc[0] - 1), (@curr_loc[1] - 2)], [@curr_loc[0] - 2, @curr_loc[1] - 1])
+    # check out of bounds 
+    @possible_moves = @possible_moves.select do |position|
+      position[0].between?(0, 7) && position[1].between?(0, 7)
+    end
+    # check if the space is empty or has an enemy
+    @possible_moves = @possible_moves.select do |pos|
+      board[pos[0]][pos[1]] == '-' || board[pos[0]][pos[1]].color != @color
+    end
+    @possible_moves
   end
 end
 

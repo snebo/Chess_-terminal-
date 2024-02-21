@@ -6,7 +6,6 @@ require_relative './chess_pieces'
 # end
 
 # TODO: write moveset for other pieces
-# FIXME: seems to eat all pieces in avalable spot
 
 # this should hold the game logic
 class Chess
@@ -88,18 +87,18 @@ class Chess
     lost = '   '
     return lost if ply.lost_pieces[val].nil?
 
-    lost = ply.lost_pieces[val].to_s # add to value
-    ply.lost_pieces[val + 1].nil? ? lost << ",  " : lost << ",#{ply.lost_pieces[val + 1]}"
+    lost = ply.lost_pieces[val].value.to_s # add to value
+    ply.lost_pieces[val + 1].nil? ? lost << ", " : lost << ",#{ply.lost_pieces[val + 1].value}"
     lost
   end
 
   def draw_board(board = @board)
-    system('cls') || system('clear')
+    # system('cls') || system('clear')
     cols = '    a   b   c   d   e   f   g   h'
     rows = [1, 2, 3, 4, 5, 6, 7, 8]
     line = '  ---------------------------------'
     mpt = ' |  '; space = '        '; div_space = '  |  '; k = 0
-    puts line + space + @pl1.name + div_space + @pl2.name
+    puts "#{line + space + @pl1.name}  |  #{@pl2.name}"
 
     # lst_pice = space + print_lst_pices(@pl1, k) + div_space + print_lst_pices(@pl2, k)
 
@@ -118,7 +117,7 @@ class Chess
       # print " |#{lst_pice}\n#{line}\n"
       # print "  |#{space} #{print_lst_pices(@pl1, k)}#{div_space}#{print_lst_pices(@pl2, k)}
       print ' |'
-      print "#{space} #{lst_pices(@pl1, k)} #{div_space}#{lst_pices(@pl2, k)}"
+      print "#{space} #{lst_pices(@pl1, k)}#{div_space}#{lst_pices(@pl2, k)}"
       print "\n#{line}\n"
       k += 2 # k is the number of taken pieces to show in a line
     end
@@ -234,7 +233,7 @@ class Player
   def initialize(name, color)
     @name = name
     @color = color
-    @lost_pieces = ['X', 'A', 'X']
+    @lost_pieces = []
   end
 end
 
